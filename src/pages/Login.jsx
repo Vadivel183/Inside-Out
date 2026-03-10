@@ -1,5 +1,5 @@
 import { useState } from "react"
-import "./auth.css"
+import "./Auth.css"
 
 export default function Login({ onNavigate, onLogin }) {
   const [showPw, setShowPw]     = useState(false)
