@@ -1,5 +1,5 @@
 import { useState } from "react"
-import "./Auth.css"
+import "./auth.css"
 
 function getStrength(pw) {
   if (!pw) return 0
