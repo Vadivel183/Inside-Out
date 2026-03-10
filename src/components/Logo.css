@@ -1,0 +1,60 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+/* sizes */
+.logo--sm .logo-mark { width: 24px; height: 24px; }
+.logo--md .logo-mark { width: 32px; height: 32px; }
+.logo--lg .logo-mark { width: 44px; height: 44px; }
+
+.logo-mark {
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.logo:hover .logo-mark { transform: rotate(90deg); }
+
+.logo-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.logo--sm .logo-text-inside,
+.logo--sm .logo-text-out  { font-size: 15px; }
+.logo--sm .logo-text-dash  { font-size: 10px; }
+
+.logo--md .logo-text-inside,
+.logo--md .logo-text-out  { font-size: 18px; }
+.logo--md .logo-text-dash  { font-size: 12px; }
+
+.logo--lg .logo-text-inside,
+.logo--lg .logo-text-out  { font-size: 26px; }
+.logo--lg .logo-text-dash  { font-size: 16px; }
+
+.logo-text-inside {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--bright);
+  letter-spacing: 0.01em;
+  transition: color 0.25s;
+}
+.logo-text-dash {
+  color: var(--aw);
+  position: relative;
+  top: -1px;
+  transition: color 0.25s;
+}
+.logo-text-out {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+  transition: color 0.25s;
+}

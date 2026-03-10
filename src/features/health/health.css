@@ -1,0 +1,37 @@
+@keyframes fadeUpH { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.ho-page    { max-width: 820px; animation: fadeUpH .3s ease both; }
+.ho-header  { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.ho-eyebrow { font-size: 9px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ah); margin-bottom: 6px; }
+.ho-title   { font-family: 'Fraunces', serif; font-weight: 300; font-style: italic; font-size: 38px; color: var(--bright); line-height: 1; }
+.ho-badge   { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 4px 10px; }
+.ho-grid    { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+.ho-card    { background: var(--card-bg); border: 1px solid var(--card-border); padding: 24px; cursor: pointer; display: flex; flex-direction: column; gap: 14px; position: relative; transition: border-color .2s, background .2s; animation: fadeUpH .35s ease both; }
+.ho-card:nth-child(1) { animation-delay: .05s; }
+.ho-card:nth-child(2) { animation-delay: .10s; }
+.ho-card::after       { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--ah); transition: width .3s ease; }
+.ho-card:hover        { border-color: var(--muted); background: var(--card-hover); }
+.ho-card:hover::after { width: 100%; }
+.hc-top              { display: flex; align-items: center; justify-content: space-between; }
+.hc-icon             { font-size: 15px; color: var(--ah); }
+.hc-arrow            { font-size: 13px; color: var(--muted); transition: color .15s, transform .15s; }
+.ho-card:hover .hc-arrow { color: var(--ah); transform: translateX(4px); }
+.hc-label            { font-family: 'Fraunces', serif; font-weight: 300; font-style: italic; font-size: 22px; color: var(--bright); }
+.hc-desc             { font-size: 10px; font-weight: 300; color: var(--muted); letter-spacing: .06em; margin-top: 3px; }
+.hc-bottom           { display: flex; align-items: baseline; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.hc-stat             { font-size: 16px; font-weight: 400; color: var(--text); letter-spacing: .04em; }
+.hc-slbl             { font-size: 9px; font-weight: 300; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+
+.hs-page    { max-width: 820px; animation: fadeUpH .3s ease both; }
+.hs-header  { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.hs-eyebrow { font-size: 9px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ah); margin-bottom: 6px; }
+.hs-title   { font-family: 'Fraunces', serif; font-weight: 300; font-style: italic; font-size: 38px; color: var(--bright); line-height: 1; }
+.hs-back    { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 5px 12px; cursor: pointer; background: transparent; transition: color .15s, border-color .15s, background .15s; }
+.hs-back:hover { color: var(--bright); border-color: var(--muted); background: var(--surface); }
+.hs-chips   { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.hs-chip    { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; padding: 5px 12px; border: 1px solid var(--border); color: var(--muted); background: var(--card-bg); }
+.hs-placeholder { border: 1px dashed var(--border); padding: 48px 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: var(--card-bg); }
+.hs-ph-icon  { font-size: 28px; color: var(--muted); }
+.hs-ph-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.hs-ph-sub   { font-size: 10px; font-weight: 300; color: var(--border); letter-spacing: .06em; }

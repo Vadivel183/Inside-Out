@@ -1,0 +1,122 @@
+/* ─── Sidebar ──────────────────────────────────────────────── */
+.sidebar {
+  width: 224px; flex-shrink: 0;
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  display: flex; flex-direction: column;
+  padding: 14px 0 20px;
+  overflow-y: auto;
+  transition: background 0.25s, border-color 0.25s;
+  /* mobile: drawer */
+  z-index: 150;
+}
+
+/* ── Home button ── */
+.sb-home {
+  display: flex; align-items: center; gap: 9px;
+  margin: 0 10px 2px; padding: 9px 12px;
+  border: none; background: transparent; border-radius: 6px;
+  cursor: pointer; width: calc(100% - 20px);
+  text-align: left; font-family: 'DM Mono', monospace;
+  transition: background 0.15s;
+}
+.sb-home:hover,
+.sb-home.active             { background: var(--surface2); }
+.sb-home-icon               { font-size: 13px; color: var(--muted); transition: color 0.15s; }
+.sb-home-lbl                { font-size: 10px; font-weight: 500; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); transition: color 0.15s; }
+.sb-home:hover .sb-home-icon,
+.sb-home:hover .sb-home-lbl,
+.sb-home.active .sb-home-icon,
+.sb-home.active .sb-home-lbl { color: var(--bright); }
+
+.sb-rule { height: 1px; background: var(--sb-border); margin: 10px 14px; }
+
+/* ── Section accent colours ── */
+.sb-section[data-s="Wealth"]   { --accent: var(--aw); }
+.sb-section[data-s="Health"]   { --accent: var(--ah); }
+.sb-section[data-s="Personal"] { --accent: var(--ap); }
+
+.sb-section               { padding: 2px 0; }
+.sb-section + .sb-section { border-top: 1px solid var(--sb-border); margin-top: 4px; padding-top: 6px; }
+
+/* ── Section head ── */
+.sb-head {
+  display: flex; align-items: center;
+  position: relative; padding-left: 4px;
+}
+.sb-head.section-active::before {
+  content: '';
+  position: absolute; left: 0; top: 6px; bottom: 6px;
+  width: 2px; border-radius: 1px; background: var(--accent);
+}
+.sb-head-btn {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  padding: 8px 6px 8px 10px;
+  border: none; background: transparent; cursor: pointer;
+  font-family: 'DM Mono', monospace; text-align: left;
+  transition: opacity 0.15s;
+}
+.sb-head-btn:hover { opacity: 0.7; }
+
+.sb-icon[data-s="Wealth"],   .sb-lbl[data-s="Wealth"]   { color: var(--aw); }
+.sb-icon[data-s="Health"],   .sb-lbl[data-s="Health"]   { color: var(--ah); }
+.sb-icon[data-s="Personal"], .sb-lbl[data-s="Personal"] { color: var(--ap); }
+
+.sb-icon { font-size: 11px; }
+.sb-lbl  { font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+
+.sb-tog {
+  padding: 7px 12px; border: none; background: transparent; cursor: pointer;
+  font-size: 15px; font-weight: 300; line-height: 1;
+  color: var(--muted); font-family: 'DM Mono', monospace;
+  transition: color 0.15s;
+}
+.sb-tog:hover { color: var(--bright); }
+
+/* ── Sub-links ── */
+.sb-links        { display: flex; flex-direction: column; overflow: hidden; max-height: 400px; opacity: 1; transition: max-height .25s ease, opacity .2s ease; }
+.sb-links.closed { max-height: 0; opacity: 0; pointer-events: none; }
+
+.sb-link {
+  display: flex; align-items: center;
+  padding: 7px 14px 7px 34px;
+  color: var(--text); font-size: 12px; font-weight: 300; letter-spacing: .04em;
+  position: relative; cursor: pointer;
+  border: none; background: transparent;
+  text-align: left; width: 100%;
+  font-family: 'DM Mono', monospace;
+  transition: color .15s, background .15s;
+}
+.sb-link::before        { content: ''; position: absolute; left: 22px; width: 4px; height: 4px; border-radius: 50%; background: var(--border); transition: background .15s, transform .15s; }
+.sb-link:hover          { color: var(--bright); background: var(--surface2); }
+.sb-link:hover::before  { background: var(--accent); }
+.sb-link.active         { color: var(--bright); background: var(--surface2); }
+.sb-link.active::before { background: var(--accent); transform: scale(1.5); }
+.sb-link.active::after  { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 2px; height: 16px; background: var(--accent); border-radius: 1px; }
+
+/* ── Footer ── */
+.sb-footer { margin-top: auto; padding: 14px 18px 0; border-top: 1px solid var(--sb-border); }
+.sb-meta   { font-size: 9px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; line-height: 1.9; }
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE DRAWER
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 54px; left: 0; bottom: 0;
+    width: 75vw; max-width: 280px;
+    transform: translateX(-110%);
+    transition: transform .28s cubic-bezier(.16,1,.3,1), background 0.25s;
+    box-shadow: 6px 0 32px rgba(0,0,0,.4);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* make links bigger for touch */
+  .sb-link     { padding: 10px 14px 10px 38px; font-size: 13px; }
+  .sb-home     { padding: 11px 12px; }
+  .sb-home-lbl { font-size: 11px; }
+  .sb-head-btn { padding: 10px 6px 10px 10px; }
+}

@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap');
+
+/* ══════════════════════════════════════════════════════════════
+   THEMES — applied via data-theme on <html>
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Fallback defaults (before JS runs / no theme set) ── */
+:root {
+  --bg:          #0e0e10;
+  --surface:     #16161a;
+  --surface2:    #1c1c22;
+  --border:      #2a2a30;
+  --muted:       #44444e;
+  --text:        #c8c8d4;
+  --bright:      #f0f0f8;
+  --aw:          #c8b97a;
+  --ah:          #7ac8a8;
+  --ap:          #a87ac8;
+  --nb-bg:       #0e0e10;
+  --nb-border:   #2a2a30;
+  --sb-bg:       #0e0e10;
+  --sb-border:   #2a2a30;
+  --card-bg:     #16161a;
+  --card-border: #2a2a30;
+  --card-hover:  #1c1c22;
+  --scrollbar:   #2a2a30;
+}
+
+/* ── Dark ── */
+[data-theme="dark"], .theme-dark {
+  --bg:           #0e0e10;
+  --surface:      #16161a;
+  --surface2:     #1c1c22;
+  --border:       #2a2a30;
+  --muted:        #44444e;
+  --text:         #c8c8d4;
+  --bright:       #f0f0f8;
+  --aw:           #c8b97a;
+  --ah:           #7ac8a8;
+  --ap:           #a87ac8;
+  --nb-bg:        #0e0e10;
+  --nb-border:    #2a2a30;
+  --sb-bg:        #0e0e10;
+  --sb-border:    #2a2a30;
+  --card-bg:      #16161a;
+  --card-border:  #2a2a30;
+  --card-hover:   #1c1c22;
+  --scrollbar:    #2a2a30;
+}
+
+/* ── Light ── */
+[data-theme="light"], .theme-light {
+  --bg:           #f5f4f0;
+  --surface:      #ffffff;
+  --surface2:     #edecea;
+  --border:       #dddbd5;
+  --muted:        #9e9b94;
+  --text:         #3a3832;
+  --bright:       #1a1814;
+  --aw:           #9a8240;
+  --ah:           #3a8a68;
+  --ap:           #7a4a9a;
+  --nb-bg:        #ffffff;
+  --nb-border:    #dddbd5;
+  --sb-bg:        #ffffff;
+  --sb-border:    #dddbd5;
+  --card-bg:      #ffffff;
+  --card-border:  #dddbd5;
+  --card-hover:   #f5f4f0;
+  --scrollbar:    #dddbd5;
+}
+
+/* ── Pink — baby pink & white ── */
+[data-theme="pink"], .theme-pink {
+  --bg:           #fff0f5;
+  --surface:      #ffffff;
+  --surface2:     #fce4ec;
+  --border:       #f8bbd0;
+  --muted:        #e591b0;
+  --text:         #6d3050;
+  --bright:       #3d0a24;
+  --aw:           #e91e8c;
+  --ah:           #ad1457;
+  --ap:           #c2185b;
+  --nb-bg:        #ffffff;
+  --nb-border:    #f8bbd0;
+  --sb-bg:        #ffffff;
+  --sb-border:    #f8bbd0;
+  --card-bg:      #ffffff;
+  --card-border:  #f8bbd0;
+  --card-hover:   #fce4ec;
+  --scrollbar:    #f8bbd0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESET
+   ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT
+   ══════════════════════════════════════════════════════════════ */
+.app  { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.main { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 36px 40px; min-width: 0; }

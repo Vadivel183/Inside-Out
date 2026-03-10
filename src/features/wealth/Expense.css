@@ -1,0 +1,339 @@
+/* ══════════════════════════════════════════════════════════════
+   EXPENSE TRACKER
+══════════════════════════════════════════════════════════════ */
+
+.et-page {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding-bottom: 48px;
+  animation: fadeUp .3s ease both;
+}
+
+/* ── Section ── */
+.et-section {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.et-section-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px; flex-wrap: wrap;
+}
+
+.et-eyebrow {
+  font-size: 8px; font-weight: 500; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--aw); margin-bottom: 5px;
+}
+
+.et-section-title {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-weight: 300; font-size: 22px;
+  color: var(--bright); line-height: 1;
+}
+
+/* ── Calendar date picker ── */
+.et-date-picker {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400;
+  color: var(--bright); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 5px 12px; outline: none; cursor: pointer;
+  transition: border-color .15s;
+  color-scheme: dark;
+}
+.et-date-picker:focus,
+.et-date-picker:hover { border-color: var(--aw); }
+[data-theme="light"] .et-date-picker { color-scheme: light; }
+[data-theme="pink"]  .et-date-picker { color-scheme: light; }
+
+/* ── Date navigation ── */
+.et-date-nav {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.et-nav-btn {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); background: transparent;
+  border: 1px solid var(--border); padding: 5px 12px;
+  cursor: pointer; border-radius: 3px;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.et-nav-btn:hover { color: var(--bright); border-color: var(--aw); background: var(--surface2); }
+.et-nav-today { border-color: var(--aw); color: var(--aw); }
+
+/* ── Month nav ── */
+.et-month-nav { display: flex; align-items: center; gap: 8px; }
+.et-month-select {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); padding: 5px 10px;
+  cursor: pointer; outline: none; border-radius: 3px;
+  transition: border-color .15s;
+}
+.et-month-select:focus { border-color: var(--aw); }
+.et-month-total {
+  font-size: 13px; font-weight: 500; color: var(--aw);
+  letter-spacing: .04em; padding-left: 8px;
+}
+
+/* ── Column headers ── */
+.et-row-header {
+  display: grid;
+  grid-template-columns: 2fr 130px 150px 120px 1.5fr 32px;
+  gap: 0;
+  padding: 8px 24px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 8px; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ── Rows container ── */
+.et-rows { display: flex; flex-direction: column; }
+
+/* ── Single expense row ── */
+.et-row {
+  display: grid;
+  grid-template-columns: 2fr 130px 150px 120px 1.5fr 32px;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  transition: background .1s;
+}
+.et-row:hover { background: var(--surface2); }
+.et-row:last-child { border-bottom: none; }
+
+/* ── Input base ── */
+.et-input {
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300;
+  color: var(--bright); background: transparent;
+  border: none; border-right: 1px solid var(--border);
+  padding: 11px 14px; outline: none; width: 100%;
+  transition: background .15s, color .15s;
+}
+.et-input::placeholder { color: var(--muted); opacity: .5; }
+.et-input:focus { background: rgba(200,185,122,0.04); color: var(--bright); }
+.et-input:last-child, .et-input.et-note { border-right: none; }
+
+/* Amount with ₹ prefix */
+.et-input-prefix {
+  display: flex; align-items: center;
+  border-right: 1px solid var(--border);
+}
+.et-currency {
+  padding: 0 0 0 14px; font-size: 11px; color: var(--muted);
+  flex-shrink: 0; pointer-events: none;
+}
+.et-input-prefix .et-input {
+  border-right: none; padding-left: 4px;
+}
+/* hide number spinners */
+.et-amount::-webkit-inner-spin-button,
+.et-amount::-webkit-outer-spin-button { -webkit-appearance: none; }
+.et-amount { -moz-appearance: textfield; }
+
+/* Select */
+.et-select {
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2344444e'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px;
+}
+.et-select-sm { }
+
+/* Remove button */
+.et-row-remove {
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; cursor: pointer;
+  font-size: 10px; color: var(--muted);
+  transition: color .15s;
+}
+.et-row-remove:hover { color: #c87a7a; }
+.et-row-remove.disabled { opacity: .25; cursor: not-allowed; }
+
+/* ── Section footer ── */
+.et-section-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.et-add-btn {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--aw); background: transparent;
+  border: 1px solid rgba(200,185,122,.3); padding: 6px 14px;
+  cursor: pointer; border-radius: 3px;
+  transition: background .15s, border-color .15s;
+}
+.et-add-btn:hover { background: rgba(200,185,122,.08); border-color: var(--aw); }
+
+/* Footer right cluster — total + submit */
+.et-footer-right {
+  display: flex; align-items: center; gap: 16px;
+}
+
+/* Submit button in footer */
+.et-section-footer .et-submit-btn {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--bg); background: var(--aw);
+  border: 1px solid var(--aw); padding: 7px 16px;
+  cursor: pointer; border-radius: 3px;
+  transition: background .15s, color .15s;
+}
+.et-section-footer .et-submit-btn:hover {
+  background: transparent; color: var(--aw);
+}
+
+.et-day-total {
+  display: flex; align-items: center; gap: 12px;
+}
+.et-day-count { font-size: 9px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.et-day-sum   { font-size: 14px; font-weight: 500; color: var(--bright); letter-spacing: .04em; }
+
+/* ══════════════════════════════════════════════════════════════
+   DEFERRED EXPENSE
+══════════════════════════════════════════════════════════════ */
+
+.et-defer-desc {
+  padding: 16px 24px 0;
+  font-size: 10px; font-weight: 300; color: var(--muted);
+  letter-spacing: .05em; line-height: 1.8;
+}
+
+.et-defer-form {
+  padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.et-defer-row {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+}
+
+.et-defer-field {
+  display: flex; flex-direction: column; gap: 6px;
+  flex: 1; min-width: 140px;
+}
+.et-defer-field--wide { flex: 2; }
+
+.et-defer-label {
+  font-size: 8px; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* Override et-input inside defer form — add border */
+.et-defer-form .et-input {
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 9px 12px; background: var(--surface);
+}
+.et-defer-form .et-input:focus { border-color: var(--aw); }
+.et-defer-form .et-input-prefix { border: 1px solid var(--border); border-radius: 3px; background: var(--surface); }
+.et-defer-form .et-input-prefix .et-input { border: none; background: transparent; padding-left: 4px; }
+.et-defer-form .et-input-prefix .et-currency { padding-left: 12px; }
+
+.et-defer-month-pair { display: flex; gap: 8px; }
+.et-defer-month-pair .et-input { min-width: 0; }
+
+/* Preview */
+.et-defer-preview {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px;
+  background: rgba(200,185,122,.06);
+  border: 1px solid rgba(200,185,122,.2);
+  border-radius: 4px;
+  font-size: 11px; font-weight: 300; color: var(--text);
+  letter-spacing: .03em;
+}
+.et-defer-preview--warn {
+  background: rgba(200,100,100,.06);
+  border-color: rgba(200,100,100,.2);
+  color: #c87a7a;
+}
+.et-defer-preview-icon { font-size: 13px; color: var(--aw); flex-shrink: 0; }
+.et-defer-split { color: var(--aw); }
+
+/* Actions */
+.et-defer-actions {
+  display: flex; align-items: center; justify-content: flex-end; gap: 16px;
+}
+
+.et-defer-alert {
+  font-size: 10px; letter-spacing: .06em;
+}
+.et-defer-alert.ok  { color: var(--ah); }
+.et-defer-alert.err { color: #c87a7a; }
+
+.et-submit-btn {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--bg); background: var(--aw);
+  border: 1px solid var(--aw); padding: 10px 22px;
+  cursor: pointer; border-radius: 3px;
+  transition: background .15s, color .15s;
+}
+.et-submit-btn:hover { background: transparent; color: var(--aw); }
+
+/* Deferred log */
+.et-defer-log {
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.et-defer-log-heading {
+  font-size: 8px; font-weight: 500; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.et-defer-log-row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 3px;
+  font-size: 11px;
+}
+.et-defer-log-name  { font-weight: 400; color: var(--bright); flex: 1; }
+.et-defer-log-cat   { color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.et-defer-log-range { color: var(--muted); font-size: 10px; }
+.et-defer-log-split { color: var(--aw); font-weight: 500; }
+.et-defer-log-total { color: var(--text); margin-left: auto; font-weight: 400; }
+
+/* ── Toast notification ──────────────────────────────────────── */
+.et-toast {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 20px;
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 400; letter-spacing: .04em;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+  z-index: 2000;
+  animation: toast-in .25s cubic-bezier(0.16,1,0.3,1) both;
+  pointer-events: none;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+.et-toast--ok {
+  background: var(--surface);
+  border: 1px solid var(--ah);
+  color: var(--bright);
+}
+.et-toast--err {
+  background: var(--surface);
+  border: 1px solid #c87a7a;
+  color: #c87a7a;
+}
+.et-toast-icon {
+  font-size: 12px;
+}
+.et-toast--ok  .et-toast-icon { color: var(--ah); }
+.et-toast--err .et-toast-icon { color: #c87a7a; }

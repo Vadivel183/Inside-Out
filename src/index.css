@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap');
+
+/* ─── Design Tokens ─────────────────────────────────────────── */
+
+:root {
+  --bg: #0e0e10;
+  --surface: #16161a;
+  --border: #2a2a30;
+  --muted: #44444e;
+  --text: #c8c8d4;
+  --bright: #f0f0f8;
+  --accent-w: #c8b97a;
+  --accent-h: #7ac8a8;
+  --accent-p: #a87ac8;
+}
+
+/* ─── Navbar → see Navbar.css ────────────────────────────────── */
+
+/* ─── Sidebar ────────────────────────────────────────────────── */
+
+.sidebar {
+  font-family: 'DM Mono', monospace;
+  background: var(--bg);
+  width: 220px;
+  min-height: 100vh;
+  padding: 32px 0 24px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--muted), transparent);
+}
+
+.sidebar-brand {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--bright);
+  letter-spacing: 0.02em;
+  padding: 0 24px 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.sidebar-brand span {
+  font-family: 'DM Mono', monospace;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav-section {
+  padding: 6px 0;
+}
+
+.nav-section + .nav-section {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+.nav-section[data-section="Wealth"]   { --accent-color: var(--accent-w); }
+.nav-section[data-section="Health"]   { --accent-color: var(--accent-h); }
+.nav-section[data-section="Personal"] { --accent-color: var(--accent-p); }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+
+.section-header:hover {
+  opacity: 0.8;
+}
+
+.section-icon {
+  font-size: 10px;
+  color: var(--accent-color);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.section-header.open .section-icon {
+  transform: rotate(45deg);
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  flex: 1;
+}
+
+.section-toggle {
+  font-size: 9px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 200px;
+  opacity: 1;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.nav-links.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 24px 7px 40px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  position: relative;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: background 0.15s, transform 0.15s;
+}
+
+.nav-link:hover {
+  color: var(--bright);
+  background: var(--surface);
+}
+
+.nav-link:hover::before {
+  background: var(--accent-color);
+}
+
+.nav-link.active {
+  color: var(--bright);
+  background: var(--surface);
+}
+
+.nav-link.active::before {
+  background: var(--accent-color);
+  transform: scale(1.5);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 16px;
+  background: var(--accent-color);
+  border-radius: 1px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 20px 24px 0;
+  border-top: 1px solid var(--border);
+}
+
+.footer-meta {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* ─── Layout ─────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  background: var(--bg);
+}

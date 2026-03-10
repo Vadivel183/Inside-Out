@@ -1,0 +1,170 @@
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — content layout only
+   Navbar & Sidebar handle their own breakpoints internally
+══════════════════════════════════════════════════════════════ */
+
+/* Sidebar backdrop overlay */
+.sb-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  top: 54px;
+  z-index: 140;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ── Global layout tweak for all screens ── */
+.main { overflow-x: hidden; }
+
+/* ══════════════════════════════════════════════════════════════
+   TABLET  769px – 1024px
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .main    { padding: 24px 24px; }
+  .sidebar { width: 200px; }
+
+  .wo-grid { grid-template-columns: repeat(2, 1fr); }
+  .ho-grid { grid-template-columns: repeat(2, 1fr); }
+  .pf-layout { grid-template-columns: 1fr 230px; }
+
+  .et-row,
+  .et-row-header { grid-template-columns: 2fr 110px 140px 100px 1fr 32px; }
+
+  .rt-entry-grid { grid-template-columns: 1fr 1fr; }
+  .rt-entry-col--photo {
+    grid-column: 1 / -1;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE  ≤ 768px
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Show backdrop when sidebar open */
+  .sb-backdrop { display: block; }
+
+  .main { padding: 16px 14px; }
+
+  /* ── Page titles ── */
+  .sp-title, .wo-title, .ho-title,
+  .hs-title, .rt-title { font-size: 26px !important; }
+
+  /* ── Overview grids → single column ── */
+  .wo-grid { grid-template-columns: 1fr !important; }
+  .ho-grid { grid-template-columns: 1fr !important; }
+
+  /* ── Portfolio → stack ── */
+  .pf-layout { grid-template-columns: 1fr !important; }
+
+  /* ── Expense section headers ── */
+  .et-section-head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px; padding: 14px 16px !important;
+  }
+  .et-date-nav  { flex-wrap: wrap; gap: 6px; }
+  .et-month-nav { flex-wrap: wrap; gap: 6px; }
+
+  /* ── Expense rows → stacked cards ── */
+  .et-row-header { display: none !important; }
+  .et-row {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .et-row .et-input,
+  .et-row .et-input-prefix {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    width: 100% !important;
+  }
+  .et-row .et-note        { border-bottom: none !important; }
+  .et-row .et-input-prefix { flex: none !important; }
+  .et-row-remove {
+    border-top: 1px solid var(--border) !important;
+    width: 100% !important; height: 38px !important;
+    justify-content: center !important;
+  }
+
+  /* ── Expense footer ── */
+  .et-section-footer {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px; padding: 12px 16px !important;
+  }
+  .et-footer-right { width: 100% !important; justify-content: space-between !important; }
+  .et-section-footer .et-submit-btn { flex: 1; text-align: center !important; }
+
+  /* ── Deferred form ── */
+  .et-defer-form   { padding: 14px 16px !important; }
+  .et-defer-row    { flex-direction: column !important; }
+  .et-defer-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .et-defer-form .et-submit-btn { text-align: center !important; }
+
+  /* ── SIP modal → bottom sheet ── */
+  .sip-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .sip-modal   { max-width: 100% !important; border-radius: 16px 16px 0 0 !important; }
+  .sip-body    { grid-template-columns: 1fr !important; }
+  .sip-inputs  { border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+
+  /* ── Routine page ── */
+  .rt-page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .rt-header-actions { flex-wrap: wrap; }
+  .rt-log-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .rt-date-nav { flex-wrap: wrap; gap: 6px; }
+  .rt-entry-grid { grid-template-columns: 1fr !important; }
+  .rt-entry-col {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 16px !important;
+  }
+  .rt-entry-col:last-child   { border-bottom: none !important; }
+  .rt-entry-col--photo { grid-column: unset !important; border-top: none !important; }
+  .rt-log-footer {
+    flex-direction: column !important;
+    gap: 8px !important; padding: 12px 16px !important;
+  }
+  .rt-save-btn { width: 100% !important; text-align: center !important; }
+
+  /* ── Routine modals → bottom sheet ── */
+  .rt-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .rt-modal   { max-width: 100% !important; border-radius: 16px 16px 0 0 !important; }
+  .rt-modal-body { max-height: 60vh !important; }
+
+  /* ── Auth → bottom sheet ── */
+  .auth-root { padding: 0 !important; align-items: flex-end; min-height: 100vh; }
+  .auth-card { grid-template-columns: 1fr !important; border-radius: 20px 20px 0 0 !important; max-width: 100% !important; }
+  .auth-left  { display: none !important; }
+  .auth-right { padding: 32px 24px 48px !important; }
+
+  /* ── Toasts → full width bottom ── */
+  .et-toast, .rt-toast {
+    left: 12px !important; right: 12px !important;
+    bottom: 16px !important; border-radius: 8px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SMALL MOBILE  ≤ 390px
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 390px) {
+  .main { padding: 12px 10px; }
+  .sp-title, .wo-title, .ho-title, .rt-title { font-size: 22px !important; }
+  .et-section-head, .rt-log-header { padding: 12px !important; }
+  .et-section-footer, .rt-log-footer { padding: 10px 12px !important; }
+  .rt-entry-col { padding: 12px !important; }
+}
