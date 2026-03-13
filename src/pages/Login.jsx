@@ -1,16 +1,31 @@
 import { useState } from "react"
-import "./auth.css"
+import { useAuth } from "../context/AuthContext"
+import { api } from "../config/api"
 
-export default function Login({ onNavigate, onLogin }) {
-  const [showPw, setShowPw]     = useState(false)
-  const [remember, setRemember] = useState(false)
-  const [email, setEmail]       = useState("")
-  const [password, setPassword] = useState("")
+export default function Login({ onNavigate }) {
+  const { login }   = useAuth()
+  const [form, setForm]     = useState({ email: "", password: "" })
+  const [error, setError]   = useState("")
+  const [loading, setLoading] = useState(false)
+  const [showPw, setShowPw] = useState(false)
 
-  const handleSubmit = (e) => {
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: call your API here, then:
-    onLogin()
+    setError("")
+    setLoading(true)
+    try {
+      const data = await api("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(form),
+      })
+      login(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -24,16 +39,14 @@ export default function Login({ onNavigate, onLogin }) {
             <span className="al-dash">—</span>
             <span className="al-out">Out</span>
           </div>
-
           <div className="auth-tagline">
             <h2 className="at-headline">
-              Your life,<br /><em>measured.</em>
+              Welcome<br /><em>back.</em>
             </h2>
             <p className="at-sub">
-              Track wealth, health and personal growth — all in one refined personal OS.
+              Your personal OS is waiting. Sign in to continue tracking, reflecting and growing.
             </p>
           </div>
-
           <div className="auth-chips">
             <span className="auth-chip w">Wealth</span>
             <span className="auth-chip h">Health</span>
@@ -49,15 +62,22 @@ export default function Login({ onNavigate, onLogin }) {
             <p className="auth-sub">Enter your credentials to continue.</p>
           </div>
 
+          {error && (
+            <div style={{ color: "#c87a7a", fontSize: "11px", marginBottom: "12px" }}>
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit}>
             <div className="auth-fields">
+
               <div className="auth-field">
                 <label className="auth-label">Email</label>
                 <div className="auth-input-wrap">
                   <input
-                    className="auth-input" type="email" placeholder="you@example.com"
-                    value={email} onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email" required
+                    className="auth-input" type="email"
+                    placeholder="you@example.com"
+                    value={form.email} onChange={set("email")} required
                   />
                   <span className="auth-input-line" />
                 </div>
@@ -67,29 +87,32 @@ export default function Login({ onNavigate, onLogin }) {
                 <label className="auth-label">Password</label>
                 <div className="auth-input-wrap auth-input-toggle">
                   <input
-                    className="auth-input" type={showPw ? "text" : "password"} placeholder="••••••••"
-                    value={password} onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="current-password" required
+                    className="auth-input"
+                    type={showPw ? "text" : "password"}
+                    placeholder="Your password"
+                    value={form.password} onChange={set("password")} required
                   />
                   <span className="auth-input-line" />
-                  <button type="button" className="auth-toggle-btn" onClick={() => setShowPw(p => !p)}>
+                  <button type="button" className="auth-toggle-btn"
+                    onClick={() => setShowPw(p => !p)}>
                     {showPw ? "hide" : "show"}
                   </button>
                 </div>
               </div>
+
             </div>
 
             <div className="auth-meta-row">
-              <label className="auth-check-label">
-                <input type="checkbox" className="auth-checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />
-                Remember me
-              </label>
-              <button type="button" className="auth-text-link" onClick={() => onNavigate("forgot")}>
+              <span />
+              <button type="button" className="auth-text-link"
+                onClick={() => onNavigate("forgot")}>
                 Forgot password?
               </button>
             </div>
 
-            <button type="submit" className="auth-btn">Sign in →</button>
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? "Signing in..." : "Sign in →"}
+            </button>
           </form>
 
           <div className="auth-switch">

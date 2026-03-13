@@ -1,5 +1,6 @@
 import { useState } from "react"
-import "./auth.css"
+import { useAuth } from "../context/AuthContext"
+import { api } from "../config/api"
 
 function getStrength(pw) {
   if (!pw) return 0
@@ -13,33 +14,53 @@ function getStrength(pw) {
 const STR_LABEL = ["", "Weak", "Fair", "Good", "Strong"]
 const STR_CLASS = ["", "weak", "fair", "fair", "strong"]
 
-export default function Register({ onNavigate, onLogin }) {
-  const [showPw, setShowPw] = useState(false)
-  const [form, setForm]     = useState({ firstName: "", lastName: "", email: "", password: "", confirm: "" })
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
+export default function Register({ onNavigate }) {
+  const { login }   = useAuth()
+  const [showPw, setShowPw]   = useState(false)
+  const [error, setError]     = useState("")
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState({
+    firstName: "", lastName: "", email: "", password: "", confirm: ""
+  })
 
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
   const strength  = getStrength(form.password)
   const pwMatch   = form.confirm && form.password === form.confirm
   const pwNoMatch = form.confirm && form.password !== form.confirm
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: call your API here, then:
-    onLogin()
+    if (pwNoMatch) return
+    setError("")
+    setLoading(true)
+    try {
+      const data = await api("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName:  form.lastName,
+          email:     form.email,
+          password:  form.password,
+        }),
+      })
+      login(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="auth-root">
       <div className="auth-card">
 
-        {/* ── Left — branding ── */}
         <div className="auth-left">
           <div className="auth-logo">
             <span className="al-inside">Inside</span>
             <span className="al-dash">—</span>
             <span className="al-out">Out</span>
           </div>
-
           <div className="auth-tagline">
             <h2 className="at-headline">
               Begin your<br /><em>journey.</em>
@@ -48,7 +69,6 @@ export default function Register({ onNavigate, onLogin }) {
               Set up your personal OS in seconds. Everything you need to track, reflect and grow.
             </p>
           </div>
-
           <div className="auth-chips">
             <span className="auth-chip w">Expense</span>
             <span className="auth-chip w">Portfolio</span>
@@ -57,13 +77,18 @@ export default function Register({ onNavigate, onLogin }) {
           </div>
         </div>
 
-        {/* ── Right — form ── */}
         <div className="auth-right">
           <div className="auth-form-header">
             <p className="auth-eyebrow">New account</p>
             <h1 className="auth-heading">Create account</h1>
             <p className="auth-sub">Takes less than a minute.</p>
           </div>
+
+          {error && (
+            <div style={{ color: "#c87a7a", fontSize: "11px", marginBottom: "12px" }}>
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="auth-fields">
@@ -72,14 +97,16 @@ export default function Register({ onNavigate, onLogin }) {
                 <div className="auth-field">
                   <label className="auth-label">First name</label>
                   <div className="auth-input-wrap">
-                    <input className="auth-input" type="text" placeholder="Ada" value={form.firstName} onChange={set("firstName")} required />
+                    <input className="auth-input" type="text" placeholder="Ada"
+                      value={form.firstName} onChange={set("firstName")} required />
                     <span className="auth-input-line" />
                   </div>
                 </div>
                 <div className="auth-field">
                   <label className="auth-label">Last name</label>
                   <div className="auth-input-wrap">
-                    <input className="auth-input" type="text" placeholder="Lovelace" value={form.lastName} onChange={set("lastName")} required />
+                    <input className="auth-input" type="text" placeholder="Lovelace"
+                      value={form.lastName} onChange={set("lastName")} required />
                     <span className="auth-input-line" />
                   </div>
                 </div>
@@ -88,7 +115,8 @@ export default function Register({ onNavigate, onLogin }) {
               <div className="auth-field">
                 <label className="auth-label">Email</label>
                 <div className="auth-input-wrap">
-                  <input className="auth-input" type="email" placeholder="you@example.com" value={form.email} onChange={set("email")} required />
+                  <input className="auth-input" type="email" placeholder="you@example.com"
+                    value={form.email} onChange={set("email")} required />
                   <span className="auth-input-line" />
                 </div>
               </div>
@@ -97,11 +125,13 @@ export default function Register({ onNavigate, onLogin }) {
                 <label className="auth-label">Password</label>
                 <div className="auth-input-wrap auth-input-toggle">
                   <input
-                    className="auth-input" type={showPw ? "text" : "password"} placeholder="Min. 8 characters"
+                    className="auth-input" type={showPw ? "text" : "password"}
+                    placeholder="Min. 8 characters"
                     value={form.password} onChange={set("password")} required
                   />
                   <span className="auth-input-line" />
-                  <button type="button" className="auth-toggle-btn" onClick={() => setShowPw(p => !p)}>
+                  <button type="button" className="auth-toggle-btn"
+                    onClick={() => setShowPw(p => !p)}>
                     {showPw ? "hide" : "show"}
                   </button>
                 </div>
@@ -120,7 +150,8 @@ export default function Register({ onNavigate, onLogin }) {
               <div className="auth-field">
                 <label className="auth-label">Confirm password</label>
                 <div className="auth-input-wrap">
-                  <input className="auth-input" type="password" placeholder="Repeat password" value={form.confirm} onChange={set("confirm")} required />
+                  <input className="auth-input" type="password" placeholder="Repeat password"
+                    value={form.confirm} onChange={set("confirm")} required />
                   <span className="auth-input-line" />
                 </div>
                 {pwMatch   && <span className="auth-hint ok">Passwords match ✓</span>}
@@ -129,8 +160,8 @@ export default function Register({ onNavigate, onLogin }) {
 
             </div>
 
-            <button type="submit" className="auth-btn" disabled={!!pwNoMatch}>
-              Create account →
+            <button type="submit" className="auth-btn" disabled={!!pwNoMatch || loading}>
+              {loading ? "Creating account..." : "Create account →"}
             </button>
           </form>
 

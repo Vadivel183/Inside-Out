@@ -1,5 +1,6 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
+import { api } from "../../config/api"
 import "./health.css"
 import "./routine.css"
 
@@ -9,7 +10,7 @@ const todayStr = () => new Date().toISOString().slice(0, 10)
 const addDays  = (s, n) => { const d = new Date(s); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10) }
 const fmtDate  = (s) => new Date(s).toLocaleDateString("en-IN", { weekday:"short", day:"2-digit", month:"short", year:"numeric" })
 
-const MOODS = ["😫 Terrible","😞 Bad","😐 Meh","🙂 Good","💪 Great","🔥 On Fire"]
+const MOODS  = ["😫 Terrible","😞 Bad","😐 Meh","🙂 Good","💪 Great","🔥 On Fire"]
 const ENERGY = ["⚡ Very Low","🔋 Low","➖ Moderate","✅ High","⚡⚡ Peak"]
 
 const emptyEntry = () => ({
@@ -18,7 +19,7 @@ const emptyEntry = () => ({
   description: "", note: "", photo: null
 })
 
-/* ── Toast (portal) ─────────────────────────────────────────── */
+/* ── Toast ─────────────────────────────────────────────────── */
 function Toast({ toast }) {
   if (!toast) return null
   return createPortal(
@@ -31,18 +32,33 @@ function Toast({ toast }) {
 
 /* ── Create Routine Modal ───────────────────────────────────── */
 function CreateModal({ onSave, onClose }) {
-  const [name, setName]   = useState("")
-  const [desc, setDesc]   = useState("")
-  const [color, setColor] = useState("#c8b97a")
-  const [icon, setIcon]   = useState("◈")
+  const [name,    setName]    = useState("")
+  const [desc,    setDesc]    = useState("")
+  const [color,   setColor]   = useState("#c8b97a")
+  const [icon,    setIcon]    = useState("◈")
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState("")
 
-  const ICONS   = ["◈","◉","◎","◆","◇","◑","⊕","⊗","⊞","△"]
-  const COLORS  = ["#c8b97a","#7ac8a8","#a87ac8","#7ab4c8","#c87a7a","#c8a87a","#7a8ec8","#c8c87a"]
+  const ICONS  = ["◈","◉","◎","◆","◇","◑","⊕","⊗","⊞","△"]
+  const COLORS = ["#c8b97a","#7ac8a8","#a87ac8","#7ab4c8","#c87a7a","#c8a87a","#7a8ec8","#c8c87a"]
 
-  const handle = () => {
+  const handle = async () => {
     if (!name.trim()) return
-    onSave({ id: uid(), name: name.trim(), desc: desc.trim(), color, icon, entries: {} })
-    onClose()
+    setLoading(true)
+    setError("")
+    try {
+      const data = await api("/api/routines", {
+        method: "POST",
+        body: JSON.stringify({ name: name.trim(), description: desc.trim(), icon, color }),
+      })
+      // backend returns Routine entity with id
+      onSave({ id: data.id, name: data.name, desc: data.description || "", color: data.color, icon: data.icon, entries: {} })
+      onClose()
+    } catch (err) {
+      setError(err.message || "Failed to create routine")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return createPortal(
@@ -55,8 +71,8 @@ function CreateModal({ onSave, onClose }) {
           </div>
           <button className="rt-modal-close" onClick={onClose}>✕</button>
         </div>
-
         <div className="rt-modal-body">
+          {error && <p style={{ color:"#c87a7a", fontSize:"11px", marginBottom:"8px" }}>{error}</p>}
           <div className="rt-field">
             <label className="rt-label">Routine Name *</label>
             <input className="rt-input" placeholder="e.g. Morning Face Care"
@@ -69,7 +85,6 @@ function CreateModal({ onSave, onClose }) {
               placeholder="What does this routine involve?"
               value={desc} onChange={e => setDesc(e.target.value)} />
           </div>
-
           <div className="rt-field">
             <label className="rt-label">Icon</label>
             <div className="rt-icon-row">
@@ -81,7 +96,6 @@ function CreateModal({ onSave, onClose }) {
               ))}
             </div>
           </div>
-
           <div className="rt-field">
             <label className="rt-label">Colour</label>
             <div className="rt-color-row">
@@ -93,11 +107,11 @@ function CreateModal({ onSave, onClose }) {
             </div>
           </div>
         </div>
-
         <div className="rt-modal-footer">
           <button className="rt-btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="rt-btn-primary" style={{ background: color, borderColor: color }} onClick={handle}>
-            Create Routine →
+          <button className="rt-btn-primary" disabled={loading}
+            style={{ background: color, borderColor: color }} onClick={handle}>
+            {loading ? "Creating..." : "Create Routine →"}
           </button>
         </div>
       </div>
@@ -109,6 +123,21 @@ function CreateModal({ onSave, onClose }) {
 /* ── Remove Routine Modal ───────────────────────────────────── */
 function RemoveModal({ routines, onRemove, onClose }) {
   const [selected, setSelected] = useState(null)
+  const [loading,  setLoading]  = useState(false)
+
+  const handle = async () => {
+    if (!selected) return
+    setLoading(true)
+    try {
+      await api(`/api/routines/${selected}`, { method: "DELETE" })
+      onRemove(selected)
+      onClose()
+    } catch (err) {
+      alert(err.message || "Failed to remove")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return createPortal(
     <div className="rt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -120,7 +149,6 @@ function RemoveModal({ routines, onRemove, onClose }) {
           </div>
           <button className="rt-modal-close" onClick={onClose}>✕</button>
         </div>
-
         <div className="rt-modal-body">
           {routines.length === 0
             ? <p className="rt-empty-msg">No routines to remove.</p>
@@ -138,13 +166,10 @@ function RemoveModal({ routines, onRemove, onClose }) {
             ))
           }
         </div>
-
         <div className="rt-modal-footer">
           <button className="rt-btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="rt-btn-danger"
-            disabled={!selected}
-            onClick={() => { if (selected) { onRemove(selected); onClose() } }}>
-            Remove Selected
+          <button className="rt-btn-danger" disabled={!selected || loading} onClick={handle}>
+            {loading ? "Removing..." : "Remove Selected"}
           </button>
         </div>
       </div>
@@ -154,16 +179,42 @@ function RemoveModal({ routines, onRemove, onClose }) {
 }
 
 /* ── Entry log for one routine ──────────────────────────────── */
-function RoutineLog({ routine, onChange }) {
-  const [date, setDate]    = useState(todayStr())
-  const fileRef            = useRef()
+function RoutineLog({ routine, onChange, onToast }) {
+  const [date,    setDate]    = useState(todayStr())
+  const [saving,  setSaving]  = useState(false)
+  const [loading, setLoading] = useState(false)
+  const fileRef = useRef()
 
-  const entries = routine.entries[date] || [emptyEntry()]
-
+  // local entry state per date
+  const entries    = routine.entries[date] || [emptyEntry()]
+  const entry      = entries[0]
   const setEntries = (next) => onChange({ ...routine, entries: { ...routine.entries, [date]: next } })
-
   const updateEntry = (id, field, val) =>
     setEntries(entries.map(e => e.id === id ? { ...e, [field]: val } : e))
+
+  // Load entry from backend when date changes
+  useEffect(() => {
+    if (routine.entries[date]) return // already loaded
+    setLoading(true)
+    api(`/api/routines/${routine.id}/entries`)
+      .then(data => {
+        const found = data.find(e => e.date === date)
+        if (found) {
+          setEntries([{
+            id:          uid(),
+            date:        found.date,
+            mood:        found.mood        || "",
+            energy:      found.energy      || "",
+            duration:    found.duration    != null ? String(found.duration) : "",
+            description: found.description || "",
+            note:        found.note        || "",
+            photo:       found.photoUrl    || null,
+          }])
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [date, routine.id])
 
   const handlePhoto = (id, file) => {
     if (!file) return
@@ -172,13 +223,37 @@ function RoutineLog({ routine, onChange }) {
     reader.readAsDataURL(file)
   }
 
-  // Each entry: date is set by the date picker; name+desc prepopulated from routine
-  const entry = entries[0] // one entry per day
+  const saveEntry = async () => {
+    setSaving(true)
+    try {
+      await api(`/api/routines/${routine.id}/entries`, {
+        method: "POST",
+        body: JSON.stringify({
+          date:        date,
+          mood:        entry.mood,
+          energy:      entry.energy,
+          duration:    entry.duration ? parseInt(entry.duration) : null,
+          description: entry.description,
+          note:        entry.note,
+          photoUrl:    null, // Cloudinary upload handled separately
+        }),
+      })
+      onToast(`${routine.name} entry saved for ${fmtDate(date)}`)
+    } catch (err) {
+      onToast(err.message || "Failed to save entry", "err")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // streak = number of unique dates with entries
+  const streakCount = Object.keys(routine.entries).filter(d => {
+    const e = routine.entries[d]?.[0]
+    return e && (e.mood || e.description || e.duration)
+  }).length
 
   return (
     <div className="rt-log" style={{ "--rt-color": routine.color }}>
-
-      {/* Log header */}
       <div className="rt-log-header">
         <div className="rt-log-title-row">
           <span className="rt-log-icon" style={{ color: routine.color }}>{routine.icon}</span>
@@ -187,8 +262,6 @@ function RoutineLog({ routine, onChange }) {
             {routine.desc && <p className="rt-log-desc">{routine.desc}</p>}
           </div>
         </div>
-
-        {/* Date navigator */}
         <div className="rt-date-nav">
           <button className="rt-nav-btn" onClick={() => setDate(d => addDays(d, -1))}>‹</button>
           <div className="rt-date-wrap">
@@ -201,112 +274,106 @@ function RoutineLog({ routine, onChange }) {
         </div>
       </div>
 
-      {/* Entry form */}
-      <div className="rt-entry-grid">
-
-        {/* Col 1 — How did it feel */}
-        <div className="rt-entry-col">
-          <div className="rt-field">
-            <label className="rt-label">How did it feel today?</label>
-            <div className="rt-mood-row">
-              {MOODS.map(m => (
-                <button key={m}
-                  className={`rt-mood-btn ${entry.mood === m ? "active" : ""}`}
-                  style={entry.mood === m ? { borderColor: routine.color, color: routine.color } : {}}
-                  onClick={() => updateEntry(entry.id, "mood", entry.mood === m ? "" : m)}>
-                  {m}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rt-field">
-            <label className="rt-label">Energy Level</label>
-            <div className="rt-mood-row">
-              {ENERGY.map(e => (
-                <button key={e}
-                  className={`rt-mood-btn ${entry.energy === e ? "active" : ""}`}
-                  style={entry.energy === e ? { borderColor: routine.color, color: routine.color } : {}}
-                  onClick={() => updateEntry(entry.id, "energy", entry.energy === e ? "" : e)}>
-                  {e}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rt-field-row">
+      {loading ? (
+        <div style={{ padding:"20px", color:"var(--muted)", fontSize:"12px" }}>Loading...</div>
+      ) : (
+        <div className="rt-entry-grid">
+          {/* Col 1 — Mood & Energy */}
+          <div className="rt-entry-col">
             <div className="rt-field">
-              <label className="rt-label">Duration (mins)</label>
-              <input className="rt-input" type="number" min="0" placeholder="e.g. 30"
-                value={entry.duration}
-                onChange={e => updateEntry(entry.id, "duration", e.target.value)} />
+              <label className="rt-label">How did it feel today?</label>
+              <div className="rt-mood-row">
+                {MOODS.map(m => (
+                  <button key={m}
+                    className={`rt-mood-btn ${entry.mood === m ? "active" : ""}`}
+                    style={entry.mood === m ? { borderColor: routine.color, color: routine.color } : {}}
+                    onClick={() => updateEntry(entry.id, "mood", entry.mood === m ? "" : m)}>
+                    {m}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="rt-field">
-              <label className="rt-label">Streak</label>
-              <div className="rt-streak-badge" style={{ borderColor: routine.color, color: routine.color }}>
-                {Object.keys(routine.entries).length} days
+              <label className="rt-label">Energy Level</label>
+              <div className="rt-mood-row">
+                {ENERGY.map(e => (
+                  <button key={e}
+                    className={`rt-mood-btn ${entry.energy === e ? "active" : ""}`}
+                    style={entry.energy === e ? { borderColor: routine.color, color: routine.color } : {}}
+                    onClick={() => updateEntry(entry.id, "energy", entry.energy === e ? "" : e)}>
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="rt-field-row">
+              <div className="rt-field">
+                <label className="rt-label">Duration (mins)</label>
+                <input className="rt-input" type="number" min="0" placeholder="e.g. 30"
+                  value={entry.duration}
+                  onChange={e => updateEntry(entry.id, "duration", e.target.value)} />
+              </div>
+              <div className="rt-field">
+                <label className="rt-label">Streak</label>
+                <div className="rt-streak-badge" style={{ borderColor: routine.color, color: routine.color }}>
+                  {streakCount} days
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Col 2 — Notes */}
-        <div className="rt-entry-col">
-          <div className="rt-field">
-            <label className="rt-label">Progress Notes</label>
-            <textarea className="rt-input rt-textarea rt-textarea--tall"
-              placeholder={`How was your ${routine.name} today? Any changes, improvements or struggles?`}
-              value={entry.description}
-              onChange={e => updateEntry(entry.id, "description", e.target.value)} />
+          {/* Col 2 — Notes */}
+          <div className="rt-entry-col">
+            <div className="rt-field">
+              <label className="rt-label">Progress Notes</label>
+              <textarea className="rt-input rt-textarea rt-textarea--tall"
+                placeholder={`How was your ${routine.name} today?`}
+                value={entry.description}
+                onChange={e => updateEntry(entry.id, "description", e.target.value)} />
+            </div>
+            <div className="rt-field">
+              <label className="rt-label">Quick Note (optional)</label>
+              <input className="rt-input" placeholder="Reminder, product used, etc."
+                value={entry.note}
+                onChange={e => updateEntry(entry.id, "note", e.target.value)} />
+            </div>
           </div>
-          <div className="rt-field">
-            <label className="rt-label">Quick Note (optional)</label>
-            <input className="rt-input" placeholder="Reminder, product used, etc."
-              value={entry.note}
-              onChange={e => updateEntry(entry.id, "note", e.target.value)} />
+
+          {/* Col 3 — Photo */}
+          <div className="rt-entry-col rt-entry-col--photo">
+            <div className="rt-field">
+              <label className="rt-label">Progress Photo</label>
+              <input type="file" accept="image/*" ref={fileRef} style={{ display:"none" }}
+                onChange={e => handlePhoto(entry.id, e.target.files[0])} />
+              {entry.photo
+                ? (
+                  <div className="rt-photo-wrap">
+                    <img src={entry.photo} alt="progress" className="rt-photo" />
+                    <button className="rt-photo-remove"
+                      onClick={() => updateEntry(entry.id, "photo", null)}>✕ Remove</button>
+                  </div>
+                )
+                : (
+                  <button className="rt-photo-upload" onClick={() => fileRef.current.click()}>
+                    <span className="rt-photo-icon">◎</span>
+                    <span>Upload Photo</span>
+                    <span className="rt-photo-sub">jpg, png, webp</span>
+                  </button>
+                )
+              }
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Col 3 — Photo */}
-        <div className="rt-entry-col rt-entry-col--photo">
-          <div className="rt-field">
-            <label className="rt-label">Progress Photo</label>
-            <input type="file" accept="image/*" ref={fileRef} style={{ display:"none" }}
-              onChange={e => handlePhoto(entry.id, e.target.files[0])} />
-            {entry.photo
-              ? (
-                <div className="rt-photo-wrap">
-                  <img src={entry.photo} alt="progress" className="rt-photo" />
-                  <button className="rt-photo-remove"
-                    onClick={() => updateEntry(entry.id, "photo", null)}>✕ Remove</button>
-                </div>
-              )
-              : (
-                <button className="rt-photo-upload" onClick={() => fileRef.current.click()}>
-                  <span className="rt-photo-icon">◎</span>
-                  <span>Upload Photo</span>
-                  <span className="rt-photo-sub">jpg, png, webp</span>
-                </button>
-              )
-            }
-          </div>
-        </div>
-
-      </div>
-
-      {/* Save button */}
       <div className="rt-log-footer">
         <span className="rt-log-footer-date">{fmtDate(date)}</span>
-        <button className="rt-save-btn" style={{ background: routine.color, borderColor: routine.color }}
-          onClick={() => {
-            // ensure entry is saved (already in state)
-            // TODO: POST /api/routines/:id/entries  { date, ...entry }
-            console.log("[Routine] Save", routine.name, date, entry)
-          }}>
-          Save Entry ↑
+        <button className="rt-save-btn" disabled={saving}
+          style={{ background: routine.color, borderColor: routine.color }}
+          onClick={saveEntry}>
+          {saving ? "Saving..." : "Save Entry ↑"}
         </button>
       </div>
-
     </div>
   )
 }
@@ -315,35 +382,41 @@ function RoutineLog({ routine, onChange }) {
    MAIN
 ══════════════════════════════════════════════════════════════ */
 export default function Routine() {
-  const [routines,    setRoutines]    = useState([])
-  const [showCreate,  setShowCreate]  = useState(false)
-  const [showRemove,  setShowRemove]  = useState(false)
-  const [toast,       setToast]       = useState(null)
+  const [routines,   setRoutines]   = useState([])
+  const [showCreate, setShowCreate] = useState(false)
+  const [showRemove, setShowRemove] = useState(false)
+  const [toast,      setToast]      = useState(null)
+  const [loading,    setLoading]    = useState(true)
 
   const showToast = (msg, type = "ok") => {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3000)
   }
 
-  const addRoutine = (r) => {
-    setRoutines(prev => [...prev, r])
-    showToast(`"${r.name}" routine created.`)
-  }
+  // Load routines from backend on mount
+  useEffect(() => {
+    api("/api/routines")
+      .then(data => {
+        setRoutines(data.map(r => ({
+          id:      r.id,
+          name:    r.name,
+          desc:    r.description || "",
+          color:   r.color || "#c8b97a",
+          icon:    r.icon  || "◈",
+          entries: {},
+        })))
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
 
-  const removeRoutine = (id) => {
-    const r = routines.find(r => r.id === id)
-    setRoutines(prev => prev.filter(r => r.id !== id))
-    showToast(`"${r?.name}" removed.`, "err")
-  }
-
-  const updateRoutine = (updated) =>
-    setRoutines(prev => prev.map(r => r.id === updated.id ? updated : r))
+  const addRoutine    = (r)  => { setRoutines(prev => [...prev, r]); showToast(`"${r.name}" created.`) }
+  const removeRoutine = (id) => { const r = routines.find(r => r.id === id); setRoutines(prev => prev.filter(r => r.id !== id)); showToast(`"${r?.name}" removed.`, "err") }
+  const updateRoutine = (updated) => setRoutines(prev => prev.map(r => r.id === updated.id ? updated : r))
 
   return (
     <>
       <div className="rt-page">
-
-        {/* Page header */}
         <div className="rt-page-header">
           <div>
             <p className="rt-eyebrow">Health · Routine</p>
@@ -360,8 +433,11 @@ export default function Routine() {
           </div>
         </div>
 
-        {/* Empty state */}
-        {routines.length === 0 && (
+        {loading ? (
+          <div style={{ padding:"40px", color:"var(--muted)", fontSize:"12px", textAlign:"center" }}>
+            Loading routines...
+          </div>
+        ) : routines.length === 0 ? (
           <div className="rt-empty">
             <span className="rt-empty-icon">◎</span>
             <span className="rt-empty-label">No routines yet</span>
@@ -370,16 +446,14 @@ export default function Routine() {
               + Create your first routine
             </button>
           </div>
+        ) : (
+          routines.map(r => (
+            <RoutineLog key={r.id} routine={r} onChange={updateRoutine} onToast={showToast} />
+          ))
         )}
-
-        {/* Routine logs */}
-        {routines.map(r => (
-          <RoutineLog key={r.id} routine={r} onChange={updateRoutine} />
-        ))}
-
       </div>
 
-      {showCreate && <CreateModal onSave={addRoutine}    onClose={() => setShowCreate(false)} />}
+      {showCreate && <CreateModal onSave={addRoutine} onClose={() => setShowCreate(false)} />}
       {showRemove && <RemoveModal routines={routines} onRemove={removeRoutine} onClose={() => setShowRemove(false)} />}
       <Toast toast={toast} />
     </>

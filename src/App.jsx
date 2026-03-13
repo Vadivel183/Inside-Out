@@ -1,20 +1,24 @@
-import { useState } from "react"
-import { AppProvider } from "./context/AppContext"
 import { ThemeProvider } from "./context/Themecontext"
+import { AppProvider }   from "./context/AppContext"
+import { AuthProvider, useAuth } from "./context/AuthContext"
 import AuthPage  from "./pages/AuthPage"
 import Dashboard from "./pages/Dashboard"
 
-export default function App() {
-  const [authed, setAuthed] = useState(false)
+function AppContent() {
+  const { isLoggedIn, logout } = useAuth()
 
+  if (!isLoggedIn) return <AuthPage onLogin={() => {}} />
+  return <Dashboard onLogout={logout} />
+}
+
+export default function App() {
   return (
     <ThemeProvider>
-      <AppProvider>
-        {authed
-          ? <Dashboard onLogout={() => setAuthed(false)} />
-          : <AuthPage  onLogin={()  => setAuthed(true)}  />
-        }
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </AuthProvider>
     </ThemeProvider>
   )
 }
